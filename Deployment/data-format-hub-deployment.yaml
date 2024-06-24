@@ -1,0 +1,32 @@
+---
+# Source: extraction-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment 
+metadata
+  name: data-format-hub
+  namespace: ar
+spec:
+  selector:
+    matchLabels:
+      app: data-format-hub
+      replica: blue
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: data-format-hub
+        replica: blue
+    spec:
+      containers:
+        - name: data-format-hub
+          image: xxxx.dkr.ecr.us-east-1.amazonaws.com/data-format-hub_v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          resources:           
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+            requests:
+              cpu: "100m"
+              memory: "200Mi"

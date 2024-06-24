@@ -1,0 +1,19 @@
+---
+# Source: extraction-chart/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-format-hub
+  namespace: ar
+  labels:
+    app: data-format-hub
+spec:
+  type: ClusterIP
+  selector:
+    app: data-format-hub
+    replica: blue
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+      protocol: TCP
