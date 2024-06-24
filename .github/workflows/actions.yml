@@ -1,23 +1,10 @@
 name: AR-data-format-hub Actions
-on: workflow_dispatch   # [push, workflow_dispatch]
-on:
-  pull_request:
-    types:
-      - closed # Trigger the workflow when a pull request is closed
-
+on: workflow_dispatch 
 env:
   AWS_REGION: us-east-1
 jobs: 
 
-  If_merged:
-    if: github.event.pull_request.merged == true # Check if the pull request was merged
-    runs-on: ubuntu-latest # Specify the runner
-    steps:
-    - run: |
-        echo The PR was merged # Print a message if the pull request was merged
-
   Python_Build:
-    needs: If_merged
     runs-on: ubuntu-latest
     steps:
       - name: code checkout
