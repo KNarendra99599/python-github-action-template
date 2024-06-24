@@ -1,4 +1,4 @@
-# Schedule a Python script with GitHub Actions
+## Schedule a Python script with GitHub Actions
 
 **Watch the video tutorial:**
 
