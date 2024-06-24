@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: data-format-hub
-          image: xxxx.dkr.ecr.us-east-1.amazonaws.com/data-format-hub_v1
+          image: .dkr.ecr.us-east-1.amazonaws.com/docker:_12   
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
