@@ -23,5 +23,50 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements/dev.txt
+
+#      - name: Run tests
+#        run: |
+#          pytest --junitxml=reports/junit/test-results.xml
+
+#      - name: Lint with flake8
+#        run: |
+#          pip install flake8
+#          flake8 .
+
+  BUILD_AND_PUBLISH:
+#   if: false
+    needs: Python_Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v4
+      - name: upload image to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ secrets.REGISTRY }}
+          repo: ${{ secrets.REPOSITORY }}
+          region: ${{ env.AWS_REGION }}
           current_date=$(date +'%Y%m%d')
           echo "current_date: ${current_date}"
+          tags: ${{ secrets.APPLICATION_NAME }}_${current_date}_v1.0.${{ github.run_number }}
+          daemon_off: false
+          dockerfile: ./Dockerfile
+          context: ./
+      - name: Update Image tag
+        run: >
+          sed -i "s|image:.*|image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY }}:${tags}   |" ./Deployment/data-format-hub-deployment.yaml
+      - name: Commit changes
+        run: |
+          git config --global user.name ${{ secrets.USER_NAME }}
+          git config --global user.email ${{ secrets.USER_MAIL }}
+          git add Deployment/data-format-hub-deployment.yaml
+          git commit -m "Update image to ${tags}"
+
+      - name: Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          git push origin main
