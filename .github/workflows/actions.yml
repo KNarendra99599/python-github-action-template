@@ -49,7 +49,7 @@ jobs:
           repo: ${{ secrets.REPOSITORY }}
           region: ${{ env.AWS_REGION }}
           current_date : $(date +'%Y%m%d')
-          tags: ${{ secrets.APPLICATION_NAME }}_${current_date}_v1.0.${{ github.run_number }}
+          tags: ${{ secrets.APPLICATION_NAME }}_$(date +'%Y%m%d')_v1.0.${{ github.run_number }}
           daemon_off: false
           dockerfile: ./Dockerfile
           context: ./
