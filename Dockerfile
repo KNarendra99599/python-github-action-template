@@ -3,7 +3,7 @@ WORKDIR /data
 
 COPY . /data  
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements/dev.txt
 
 ENV PYTHONPATH=/data
 
