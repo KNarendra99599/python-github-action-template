@@ -1,9 +1,5 @@
 name: AR-data-format-hub Actions
-#on: workflow_dispatch   # [push, workflow_dispatch]
-on:
-  pull_request:
-    types:
-      - closed # Trigger the workflow when a pull request is closed
+on: workflow_dispatch   # [push, workflow_dispatch]
 
 env:
   AWS_REGION: us-east-1
@@ -12,15 +8,7 @@ permissions:
 
 jobs: 
 
-  If_merged:
-    if: github.event.pull_request.merged == true # Check if the pull request was merged
-    runs-on: ubuntu-latest # Specify the runner
-    steps:
-    - run: |
-        echo The PR was merged # Print a message if the pull request was merged
-
   Python_Build:
-    needs: If_merged
     runs-on: ubuntu-latest
     steps:
       - name: code checkout
@@ -60,19 +48,20 @@ jobs:
           registry: ${{ secrets.REGISTRY }}
           repo: ${{ secrets.REPOSITORY }}
           region: ${{ env.AWS_REGION }}
-          tags: ${{ secrets.APPLICATION_NAME }}_${{ github.run_number }}
+          current_date : $(date +'%Y%m%d')
+          tags: ${{ secrets.APPLICATION_NAME }}_${current_date}_v1.0.${{ github.run_number }}
           daemon_off: false
           dockerfile: ./Dockerfile
           context: ./
       - name: Update Image tag
         run: >
-          sed -i "s|image:.*|image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY }}:${{ secrets.APPLICATION_NAME }}_${{ github.run_number }}   |" ./Deployment/data-format-hub-deployment.yaml
+          sed -i "s|image:.*|image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY }}:${tags}   |" ./Deployment/data-format-hub-deployment.yaml
       - name: Commit changes
         run: |
           git config --global user.name ${{ secrets.USER_NAME }}
           git config --global user.email ${{ secrets.USER_MAIL }}
           git add Deployment/data-format-hub-deployment.yaml
-          git commit -m "Update image to ${{ secrets.APPLICATION_NAME }}_${{ github.run_number }}"
+          git commit -m "Update image to ${tags}"
 
       - name: Push changes
         env:
