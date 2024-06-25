@@ -57,13 +57,13 @@ jobs:
 
       - name: Update Image tag
         run: >
-          sed -i "s|image:.*|image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY }}:${tags}   |" ./Deployment/data-format-hub-deployment.yaml
+          sed -i "s|image:.*|image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY }}:${{ secrets.APPLICATION_NAME }}_${{ env.current_date }}_v1.0.${{ github.run_number }}   |" ./Deployment/data-format-hub-deployment.yaml
       - name: Commit changes
         run: |
           git config --global user.name ${{ secrets.USER_NAME }}
           git config --global user.email ${{ secrets.USER_MAIL }}
           git add Deployment/data-format-hub-deployment.yaml
-          git commit -m "Update image to ${tags}"
+          git commit -m "Update image to ${{ secrets.APPLICATION_NAME }}_${{ env.current_date }}_v1.0.${{ github.run_number }}"
 
       - name: Push changes
         env:
