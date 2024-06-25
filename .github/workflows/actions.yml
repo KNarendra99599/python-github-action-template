@@ -40,6 +40,8 @@ jobs:
     steps:
       - name: code checkout
         uses: actions/checkout@v4
+      - name: Set current date
+        run: echo "current_date=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - name: upload image to ECR
         uses: appleboy/docker-ecr-action@master
         with:
@@ -48,12 +50,11 @@ jobs:
           registry: ${{ secrets.REGISTRY }}
           repo: ${{ secrets.REPOSITORY }}
           region: ${{ env.AWS_REGION }}
-          current_date=$(date +'%Y%m%d')
-          echo "current_date: ${current_date}"
-          tags: ${{ secrets.APPLICATION_NAME }}_${current_date}_v1.0.${{ github.run_number }}
+          tags: ${{ secrets.APPLICATION_NAME }}_${{ env.current_date }}_v1.0.${{ github.run_number }}
           daemon_off: false
           dockerfile: ./Dockerfile
           context: ./
+
       - name: Update Image tag
         run: >
           sed -i "s|image:.*|image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY }}:${tags}   |" ./Deployment/data-format-hub-deployment.yaml
